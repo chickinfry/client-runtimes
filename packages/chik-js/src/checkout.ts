@@ -661,13 +661,14 @@ function checkoutReturnNavigation(
   config: Required<ChikCheckoutBridgeConfiguration>,
   wrapper: URL,
 ): ChikCheckoutNavigation {
+  const rootPath = wrapper.pathname === "" || wrapper.pathname === "/";
   const nestedValues = wrapper.searchParams.getAll("url");
   if (nestedValues.length === 0) {
-    if (!wrapper.username && !wrapper.password && !wrapper.host && !wrapper.pathname && !wrapper.hash
+    if (!wrapper.username && !wrapper.password && !wrapper.host && rootPath && !wrapper.hash
       && [...wrapper.searchParams.keys()].length === 0) return { action: "restore" };
     throw new ChikCheckoutError(ChikErrorCode.invalidArgument, "The checkout return URL is invalid.", 400);
   }
-  if (wrapper.username || wrapper.password || wrapper.host || wrapper.pathname || wrapper.hash
+  if (wrapper.username || wrapper.password || wrapper.host || !rootPath || wrapper.hash
     || nestedValues.length !== 1 || [...wrapper.searchParams.keys()].some((name) => name !== "url")) {
     throw new ChikCheckoutError(ChikErrorCode.invalidArgument, "The checkout return URL is invalid.", 400);
   }

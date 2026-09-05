@@ -596,6 +596,14 @@ test("shared mobile contract allows pages, opens apps, falls back, and completes
     ),
     { action: "resume", url: resumed },
   );
+  assert.deepEqual(
+    classifyChikCheckoutNavigation(
+      mobileConfiguration,
+      returnUrl(resumed).replace("://?", ":///?"),
+      "ios",
+    ),
+    { action: "resume", url: resumed },
+  );
 
   assert.deepEqual(
     classifyChikCheckoutNavigation(
@@ -822,6 +830,9 @@ test("mobile navigation rejects forged, duplicate, and oversized URLs", () => {
   const duplicateNested = new URL(returnUrl("https://payment-widget.tosspayments.com/widget"));
   duplicateNested.searchParams.append("url", "https://payment-widget.tosspayments.com/other");
   expectInvalidNavigation(duplicateNested.toString());
+  expectInvalidNavigation(
+    `${mobileConfiguration.appScheme}:///unexpected?url=${encodeURIComponent("https://payment-widget.tosspayments.com/widget")}`,
+  );
 
   assert.throws(
     () => classifyChikCheckoutNavigation(
@@ -833,6 +844,10 @@ test("mobile navigation rejects forged, duplicate, and oversized URLs", () => {
   );
   assert.deepEqual(
     classifyChikCheckoutNavigation(mobileConfiguration, `${mobileConfiguration.appScheme}://`, "ios"),
+    { action: "restore" },
+  );
+  assert.deepEqual(
+    classifyChikCheckoutNavigation(mobileConfiguration, `${mobileConfiguration.appScheme}:///`, "ios"),
     { action: "restore" },
   );
 });

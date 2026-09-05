@@ -832,9 +832,18 @@ final class _ExerciseMobileHost
     final resume = value.navigate(_returnUrl(resumedUrl));
     expect(resume.action, ChikCheckoutNavigationAction.resume);
     resumed.add(resume.url!);
+    final normalizedResume = value.navigate(
+      _returnUrl(resumedUrl).replaceFirst('://?', ':///?'),
+    );
+    expect(normalizedResume.action, ChikCheckoutNavigationAction.resume);
+    expect(normalizedResume.url, resumedUrl);
 
     expect(
       value.navigate('${_configuration.appScheme}://').action,
+      ChikCheckoutNavigationAction.restore,
+    );
+    expect(
+      value.navigate('${_configuration.appScheme}:///').action,
       ChikCheckoutNavigationAction.restore,
     );
 
@@ -879,6 +888,8 @@ final class _RejectingMobileHost
       'https://attacker@payment-widget.tosspayments.com/widget',
       _returnUrl('http://payment-widget.tosspayments.com/widget'),
       _returnUrl('https://attacker.test/widget'),
+      '${_configuration.appScheme}:///unexpected?url='
+          '${Uri.encodeQueryComponent('https://payment-widget.tosspayments.com/widget')}',
     ];
     for (final url in forged) {
       expect(() => value.navigate(url), throwsA(_invalidArgument()));

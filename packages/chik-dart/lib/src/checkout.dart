@@ -678,11 +678,12 @@ ChikCheckoutNavigation _checkoutReturnNavigation(
   ChikCheckoutBridgeConfiguration config,
   Uri wrapper,
 ) {
+  final rootPath = wrapper.path.isEmpty || wrapper.path == '/';
   final nestedValues = wrapper.queryParametersAll['url'];
   if (nestedValues == null || nestedValues.isEmpty) {
     if (wrapper.userInfo.isEmpty &&
         wrapper.host.isEmpty &&
-        wrapper.path.isEmpty &&
+        rootPath &&
         wrapper.fragment.isEmpty &&
         wrapper.queryParametersAll.isEmpty) {
       return const ChikCheckoutNavigation.restore();
@@ -695,7 +696,7 @@ ChikCheckoutNavigation _checkoutReturnNavigation(
   }
   if (wrapper.userInfo.isNotEmpty ||
       wrapper.host.isNotEmpty ||
-      wrapper.path.isNotEmpty ||
+      !rootPath ||
       wrapper.fragment.isNotEmpty ||
       nestedValues.length != 1 ||
       wrapper.queryParametersAll.keys.any((name) => name != 'url')) {
