@@ -1,4 +1,6 @@
 import 'package:chik_client/chik_client.dart';
+import 'package:chik_client/src/toss_key_profiles.generated.dart'
+    show tossReviewedCheckoutHttpsHosts;
 import 'package:test/test.dart';
 
 const _approvalCapability = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -763,10 +765,12 @@ final class _ExerciseMobileHost
   @override
   Future<String> present(ChikCheckoutPresentation value) async {
     presentation = value;
-    expect(
-      value.navigate('https://payment-widget.tosspayments.com/widget').action,
-      ChikCheckoutNavigationAction.allow,
-    );
+    for (final host in tossReviewedCheckoutHttpsHosts) {
+      expect(
+        value.navigate('https://$host/widget').action,
+        ChikCheckoutNavigationAction.allow,
+      );
+    }
 
     const intent = 'intent://payments/open#Intent;scheme=supertoss;'
         'package=viva.republica.toss;end';

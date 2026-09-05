@@ -819,7 +819,7 @@ String _checkoutCallback(String value, String approvalCapability) {
 bool _reviewedHttpsNavigation(Uri url) =>
     url.userInfo.isEmpty &&
     url.fragment.isEmpty &&
-    _reviewedCheckoutHttpsHosts.contains(url.host) &&
+    tossReviewedCheckoutHttpsHosts.contains(url.host) &&
     url.port == 443;
 
 bool _reviewedFallback(String value, String packageName) {
@@ -992,15 +992,6 @@ const _reviewedIOSCheckoutFallbacks = <String, String>{
   'naversearchthirdlogin': 'https://apps.apple.com/app/id393499958',
   'kakaotalk': 'https://apps.apple.com/app/id362057947',
   'kftc-bankpay': 'https://apps.apple.com/app/id398456030',
-};
-const _reviewedCheckoutHttpsHosts = {
-  'connect.tosspayments.com',
-  'pages.tosspayments.com',
-  'payment-gateway.tosspayments.com',
-  'payment-gateway-sandbox.tosspayments.com',
-  'payment-gateway-stable.tosspayments.com',
-  'payment-gateway-stable-sandbox.tosspayments.com',
-  'payment-widget.tosspayments.com',
 };
 final _orderId = RegExp(r'^[A-Za-z0-9_-]{6,64}$');
 final _customerKey = RegExp(r'^(?=.{2,50}$)(?=.*[-_=.@])[A-Za-z0-9_=.@-]+$');

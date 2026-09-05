@@ -14,6 +14,7 @@ import {
   recoverChikReactNativeCheckout,
   restoreChikReactNativeCheckout,
 } from "../dist/react-native-checkout.js";
+import { TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS } from "../dist/toss-key-profiles.generated.js";
 
 const approvalCapability = "a".repeat(43);
 const sessionScope = "c".repeat(64);
@@ -578,14 +579,16 @@ test("shared mobile contract allows pages, opens apps, falls back, and completes
   assert.match(document, /exampleapp/);
   assert.match(document, /payments\.widgets/);
 
-  assert.deepEqual(
-    classifyChikCheckoutNavigation(
-      mobileConfiguration,
-      "https://payment-widget.tosspayments.com/widget",
-      "ios",
-    ),
-    { action: "allow" },
-  );
+  for (const host of TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS) {
+    assert.deepEqual(
+      classifyChikCheckoutNavigation(
+        mobileConfiguration,
+        `https://${host}/widget`,
+        "ios",
+      ),
+      { action: "allow" },
+    );
+  }
 
   const resumed = "https://payment-widget.tosspayments.com/resume";
   assert.deepEqual(

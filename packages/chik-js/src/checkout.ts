@@ -1,5 +1,6 @@
 import { ChikErrorCode, type ChikErrorCode as ChikErrorCodeValue } from "./error-contract.js";
 import {
+  TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS,
   TossCheckoutProfile,
   tossClientKeyProfile,
 } from "./toss-key-profiles.generated.js";
@@ -68,12 +69,7 @@ const reviewedAndroidCheckoutPackages: Readonly<Record<string, readonly string[]
   v3mobileplusweb: reviewedAndroidPackages("com.ahnlab.v3mobileplus"),
   wooripay: reviewedAndroidPackages("com.wooricard.wpay"),
 });
-const reviewedCheckoutHttpsHosts = new Set([
-  "connect.tosspayments.com", "pages.tosspayments.com",
-  "payment-gateway.tosspayments.com", "payment-gateway-sandbox.tosspayments.com",
-  "payment-gateway-stable.tosspayments.com", "payment-gateway-stable-sandbox.tosspayments.com",
-  "payment-widget.tosspayments.com",
-]);
+const reviewedCheckoutHttpsHosts = new Set<string>(TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS);
 const reviewedIOSCheckoutFallbacks: Readonly<Record<string, string>> = Object.freeze({
   supertoss: "https://apps.apple.com/app/id839333328",
   ispmobile: "https://apps.apple.com/app/id369125087",

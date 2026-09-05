@@ -20,6 +20,18 @@ enum TossCheckoutProfile {
 
 typedef TossKeyProfile = ({TossKeyEnvironment environment, TossCheckoutProfile profile, bool paymentTypeInRedirect});
 
+const tossReviewedCheckoutHttpsHosts = <String>{
+  "connect.tosspayments.com",
+  "pages.tosspayments.com",
+  "payment-gateway.tosspayments.com",
+  "payment-gateway-sandbox.tosspayments.com",
+  "payment-gateway-stable.tosspayments.com",
+  "payment-gateway-stable-sandbox.tosspayments.com",
+  "payment-widget.tosspayments.com",
+  "online-pay.kakao.com",
+  "online-payment.kakaopay.com",
+};
+
 final _environments = <String, TossKeyEnvironment>{
   "test": TossKeyEnvironment.test,
   "live": TossKeyEnvironment.live,

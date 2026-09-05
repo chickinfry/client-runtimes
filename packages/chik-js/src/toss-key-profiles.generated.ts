@@ -12,6 +12,18 @@ export const TossCheckoutProfile = {
 
 export const TOSS_PENDING_URL_UNSUPPORTED_MESSAGE = "extension payments/toss supports domestic KRW synchronous checkout only; foreign asynchronous pendingUrl and CANCEL_STATUS_CHANGED are unsupported and fail closed";
 
+export const TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS = [
+  "connect.tosspayments.com",
+  "pages.tosspayments.com",
+  "payment-gateway.tosspayments.com",
+  "payment-gateway-sandbox.tosspayments.com",
+  "payment-gateway-stable.tosspayments.com",
+  "payment-gateway-stable-sandbox.tosspayments.com",
+  "payment-widget.tosspayments.com",
+  "online-pay.kakao.com",
+  "online-payment.kakaopay.com",
+] as const;
+
 export type TossKeyEnvironment = typeof TossKeyEnvironment[keyof typeof TossKeyEnvironment];
 export type TossCheckoutProfile = typeof TossCheckoutProfile[keyof typeof TossCheckoutProfile];
 export interface TossKeyProfile { readonly environment: TossKeyEnvironment; readonly profile: TossCheckoutProfile; readonly paymentTypeInRedirect: boolean }
