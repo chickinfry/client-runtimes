@@ -1,0 +1,77 @@
+{
+  "name": "@chickinfry/client",
+  "version": "0.1.0",
+  "description": "Chick client runtime for browser and native applications.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chickinfry/client-runtimes.git",
+    "directory": "packages/chik-js"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./react-native": {
+      "types": "./dist/react-native.d.ts",
+      "default": "./dist/react-native.js"
+    },
+    "./react-native/checkout": {
+      "types": "./dist/react-native-checkout.d.ts",
+      "default": "./dist/react-native-checkout.js"
+    },
+    "./react-native/checkout-host": {
+      "types": "./dist/react-native-checkout-host.d.ts",
+      "default": "./dist/react-native-checkout-host.js"
+    },
+    "./expo": {
+      "types": "./dist/expo.d.ts",
+      "default": "./dist/expo.js"
+    }
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "test": "pnpm build && node --test test/*.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "expo-secure-store": "*",
+    "expo-web-browser": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-keychain": "*",
+    "react-native-webview": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo-secure-store": {
+      "optional": true
+    },
+    "expo-web-browser": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-keychain": {
+      "optional": true
+    },
+    "react-native-webview": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

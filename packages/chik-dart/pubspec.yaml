@@ -1,0 +1,11 @@
+name: chik_client
+description: Dart and Flutter client runtime for Chick applications.
+version: 0.1.0
+repository: https://github.com/chickinfry/client-runtimes/tree/main/packages/chik-dart
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+dependencies:
+  http: ^1.6.0
+  web_socket_channel: ^3.0.3
+dev_dependencies:
+  test: ^1.25.15
