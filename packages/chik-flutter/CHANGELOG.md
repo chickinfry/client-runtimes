@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Return through checkout web history before closing the Android checkout.
+
 ## 0.1.3
 
 - Keep fresh Flutter Android projects compatible with the framework-managed compile SDK.

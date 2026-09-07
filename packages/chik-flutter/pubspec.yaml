@@ -1,6 +1,6 @@
 name: chik_flutter
 description: Flutter integration for Chick application clients.
-version: 0.1.3
+version: 0.1.4
 repository: https://github.com/chickinfry/client-runtimes/tree/main/packages/chik-flutter
 
 environment:

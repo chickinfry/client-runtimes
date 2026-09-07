@@ -452,6 +452,46 @@ void main() {
     expect(storage.values.containsKey(_recoveryKey), isFalse);
   });
 
+  testWidgets('Android 뒤로가기는 WebView 기록을 먼저 이동한 뒤 checkout을 닫는다', (
+    tester,
+  ) async {
+    final platform = _FakeWebViewPlatform();
+    WebViewPlatform.instance = platform;
+    final host = ChikFlutterMobileCheckoutHost.withIncomingLinks(
+      incomingLinks: const Stream<Uri>.empty(),
+    );
+    await tester.pumpWidget(
+      MaterialApp(navigatorKey: host.navigatorKey, home: const Placeholder()),
+    );
+
+    final result = _presentOnAndroid(
+      host,
+      _presentation((_) => const ChikCheckoutNavigation.allow()),
+    );
+    await tester.pumpAndSettle();
+    platform.controller.canNavigateBack = true;
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    expect(platform.controller.goBackCalls, 1);
+    expect(host.hasActiveSession, isTrue);
+
+    platform.controller.canNavigateBack = false;
+    final canceled = expectLater(
+      result,
+      throwsA(
+        isA<ChikCheckoutException>().having(
+          (error) => error.code,
+          'code',
+          ChikErrorCode.canceled,
+        ),
+      ),
+    );
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await canceled;
+    expect(host.hasActiveSession, isFalse);
+  });
+
   testWidgets('cold-start app link를 보관하고 active WebView에 전달한다', (tester) async {
     final platform = _FakeWebViewPlatform();
     WebViewPlatform.instance = platform;
@@ -871,6 +911,8 @@ final class _FakePlatformWebViewController extends PlatformWebViewController {
 
   String? document;
   Uri? request;
+  bool canNavigateBack = false;
+  int goBackCalls = 0;
 
   @override
   Future<void> setJavaScriptMode(JavaScriptMode javaScriptMode) async {}
@@ -888,6 +930,14 @@ final class _FakePlatformWebViewController extends PlatformWebViewController {
   @override
   Future<void> loadRequest(LoadRequestParams params) async {
     request = params.uri;
+  }
+
+  @override
+  Future<bool> canGoBack() async => canNavigateBack;
+
+  @override
+  Future<void> goBack() async {
+    goBackCalls += 1;
   }
 }
 

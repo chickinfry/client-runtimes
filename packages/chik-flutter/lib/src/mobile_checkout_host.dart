@@ -558,6 +558,7 @@ final class _CheckoutSession {
   Timer? _timer;
   Future<void>? _initialization;
   bool _settling = false;
+  bool _backNavigationPending = false;
   late final void Function() _stopListeningForSessionInvalidation;
 
   Future<String> get result => _result.future;
@@ -761,6 +762,22 @@ final class _CheckoutSession {
     }
   }
 
+  Future<void> navigateBack() async {
+    if (_result.isCompleted || _settling || _backNavigationPending) return;
+    _backNavigationPending = true;
+    try {
+      if (await controller.canGoBack()) {
+        await controller.goBack();
+        return;
+      }
+      cancel();
+    } catch (error, stackTrace) {
+      fail(_navigationError(error), stackTrace);
+    } finally {
+      _backNavigationPending = false;
+    }
+  }
+
   Future<void> complete(String url) async {
     if (_result.isCompleted || _settling) return;
     _settling = true;
@@ -853,19 +870,25 @@ final class _CheckoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Checkout'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: session.cancel,
-            tooltip: 'Close checkout',
-            icon: const Icon(Icons.close),
-          ),
-        ],
+    return PopScope<void>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(session.navigateBack());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text('Checkout'),
+          actions: <Widget>[
+            IconButton(
+              onPressed: session.cancel,
+              tooltip: 'Close checkout',
+              icon: const Icon(Icons.close),
+            ),
+          ],
+        ),
+        body: SafeArea(child: WebViewWidget(controller: session.controller)),
       ),
-      body: SafeArea(child: WebViewWidget(controller: session.controller)),
     );
   }
 }
