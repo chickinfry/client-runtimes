@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Keep fresh Flutter Android projects compatible with the framework-managed compile SDK.
+
 ## 0.1.2
 
 - Keep ordinary HTTPS application links from replacing an active checkout WebView.
