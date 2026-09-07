@@ -780,6 +780,8 @@ final class _ExerciseMobileHost
 
     const intent = 'intent://payments/open#Intent;scheme=supertoss;'
         'package=viva.republica.toss;end';
+    const vaccineIntent = 'intent://mvaccine/jsp/MISP/bcAppPay.jsp#Intent;'
+        'scheme=mvaccinestart;package=com.TouchEn.mVaccine.webs;end';
     expect(
       () => value.navigate(
         'intent://payments/open#Intent;scheme=supertoss;end',
@@ -792,6 +794,17 @@ final class _ExerciseMobileHost
     expect(
       direct.fallbackUrl,
       'https://play.google.com/store/apps/details?id=viva.republica.toss',
+    );
+    final vaccine = value.navigate(vaccineIntent);
+    expect(vaccine.action, ChikCheckoutNavigationAction.external);
+    expect(
+      vaccine.url,
+      'mvaccinestart://mvaccine/jsp/MISP/bcAppPay.jsp',
+    );
+    expect(vaccine.androidPackages, ['com.TouchEn.mVaccine.webs']);
+    expect(
+      vaccine.fallbackUrl,
+      'https://play.google.com/store/apps/details?id=com.TouchEn.mVaccine.webs',
     );
     for (final pair in <(String, String)>[
       ('v3mobileplusweb', 'com.ahnlab.v3mobileplus'),
@@ -890,6 +903,8 @@ final class _RejectingMobileHost
           'package=evil.package;end',
       'intent://payments/open#Intent;scheme=supertoss;'
           'package=com.kakao.talk;end',
+      'intent://mvaccine/open#Intent;scheme=mvaccinestart;'
+          'package=com.shcard.smartpay;end',
       'intent://payments/open#Intent;scheme=supertoss;end',
       duplicate,
       duplicateCapability,

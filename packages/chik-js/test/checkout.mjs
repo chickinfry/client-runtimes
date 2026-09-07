@@ -641,6 +641,18 @@ test("shared mobile contract allows pages, opens apps, falls back, and completes
     },
   );
 
+  const vaccineIntent =
+    "intent://mvaccine/jsp/MISP/bcAppPay.jsp#Intent;scheme=mvaccinestart;package=com.TouchEn.mVaccine.webs;end";
+  assert.deepEqual(
+    classifyChikCheckoutNavigation(mobileConfiguration, vaccineIntent, "android"),
+    {
+      action: "external",
+      url: "mvaccinestart://mvaccine/jsp/MISP/bcAppPay.jsp",
+      fallbackUrl: "https://play.google.com/store/apps/details?id=com.TouchEn.mVaccine.webs",
+      androidPackages: ["com.TouchEn.mVaccine.webs"],
+    },
+  );
+
   assert.deepEqual(
     classifyChikCheckoutNavigation(
       mobileConfiguration,
@@ -807,6 +819,10 @@ test("mobile navigation rejects forged, duplicate, and oversized URLs", () => {
   );
   expectInvalidNavigation(
     "intent://payments/open#Intent;scheme=supertoss;package=com.kakao.talk;end",
+    "android",
+  );
+  expectInvalidNavigation(
+    "intent://mvaccine/open#Intent;scheme=mvaccinestart;package=com.shcard.smartpay;end",
     "android",
   );
   expectInvalidNavigation("lmslpay://payments/open", "android");

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Support the reviewed Android card-checkout security application link.
+
 ## 0.1.3
 
 - Keep safe HTTPS checkout pages inside the mobile WebView while preserving strict application-return validation.

@@ -18,7 +18,7 @@ const reviewedCheckoutSchemes = new Set([
   "cloudpay", "hanawalletmembers", "hdcardappcardansimclick", "smhyundaiansimclick",
   "shinsegaeeasypayment", "payco", "lpayapp", "ispmobile", "kakaobank",
   "lmslpay", "wooripay", "naversearchthirdlogin", "kakaotalk", "kftc-bankpay",
-  "v3mobileplusweb",
+  "v3mobileplusweb", "mvaccinestart",
 ]);
 const reservedMobileSchemes = new Set([
   ...reviewedCheckoutSchemes,
@@ -67,6 +67,7 @@ const reviewedAndroidCheckoutPackages: Readonly<Record<string, readonly string[]
   "kftc-bankpay": reviewedAndroidPackages("com.kftc.bankpay.android"),
   naversearchthirdlogin: reviewedAndroidPackages("com.nhn.android.search"),
   v3mobileplusweb: reviewedAndroidPackages("com.ahnlab.v3mobileplus"),
+  mvaccinestart: reviewedAndroidPackages("com.TouchEn.mVaccine.webs"),
   wooripay: reviewedAndroidPackages("com.wooricard.wpay"),
 });
 const reviewedAppReturnHttpsHosts = new Set<string>(TOSS_REVIEWED_APP_RETURN_HTTPS_HOSTS);

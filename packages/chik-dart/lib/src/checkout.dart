@@ -915,6 +915,7 @@ const _reviewedCheckoutSchemes = {
   'kakaotalk',
   'kftc-bankpay',
   'v3mobileplusweb',
+  'mvaccinestart',
 };
 const _reservedMobileSchemes = {
   ..._reviewedCheckoutSchemes,
@@ -970,6 +971,7 @@ const _reviewedAndroidCheckoutPackages = <String, List<String>>{
   'kftc-bankpay': ['com.kftc.bankpay.android'],
   'naversearchthirdlogin': ['com.nhn.android.search'],
   'v3mobileplusweb': ['com.ahnlab.v3mobileplus'],
+  'mvaccinestart': ['com.TouchEn.mVaccine.webs'],
   'wooripay': ['com.wooricard.wpay'],
 };
 const _reviewedIOSCheckoutFallbacks = <String, String>{

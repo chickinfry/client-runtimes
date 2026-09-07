@@ -1,6 +1,6 @@
 {
   "name": "@chickinfry/client",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Chick client runtime for browser and native applications.",
   "license": "MIT",
   "repository": {
