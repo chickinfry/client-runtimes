@@ -314,9 +314,14 @@ test("single active session, dismiss, and timeout use canonical errors", async (
 });
 
 test("the WebView gate synchronously allows, consumes returns, and completes", async () => {
-  const host = new ChikReactNativeMobileCheckoutHost();
+  const opened = [];
+  const host = new ChikReactNativeMobileCheckoutHost({
+    openExternal: (url) => opened.push(url),
+  });
   const result = host.present(presentation((url) => {
-    if (url === "https://checkout.example/allowed") return { action: "allow" };
+    if (url === "https://checkout.example/allowed" || url === "https://checkout.example/window#state") {
+      return { action: "allow" };
+    }
     if (url.startsWith("exampleapp://")) return { action: "restore" };
     return { action: "complete", redirect: failureRedirect() };
   }));
@@ -325,6 +330,9 @@ test("the WebView gate synchronously allows, consumes returns, and completes", a
   assert.ok(active);
 
   assert.equal(host.shouldStartNavigation(active.id, "https://checkout.example/allowed"), true);
+  host.openWindow(active.id, "https://checkout.example/window#state");
+  assert.equal(host.snapshot()?.resumeUrl, "https://checkout.example/window#state");
+  assert.deepEqual(opened, []);
   assert.equal(host.shouldStartNavigation(active.id, "exampleapp://return"), false);
   assert.equal(host.shouldStartNavigation(active.id, "https://checkout.example/complete"), false);
   assert.equal(await result, "https://checkout.example/complete");
@@ -447,11 +455,16 @@ test("unreviewed incoming links are ignored without failing the active checkout"
     if (url === "https://checkout.example/complete") {
       return { action: "complete", redirect: failureRedirect() };
     }
+    if (url === "https://checkout.example/page") return { action: "allow" };
     throw new ChikCheckoutError("invalid_argument", "The checkout navigation URL is invalid.", 400);
   }));
 
   await new Promise((resolve) => setImmediate(resolve));
 
+  const active = host.snapshot();
+  assert.ok(active);
+  emitReturnUrl("https://checkout.example/page");
+  assert.equal(host.snapshot(), active);
   emitReturnUrl("unreviewed://return");
   assert.equal(host.hasActiveSession, true);
   emitReturnUrl("https://checkout.example/complete");

@@ -286,18 +286,7 @@ export class ChikReactNativeMobileCheckoutHost implements ChikMobileCheckoutHost
       this.#settle(active.id, undefined, checkoutNavigationError(error));
       return true;
     }
-    if (decision.action === "allow") {
-      if (!value.startsWith("https://")) {
-        this.#settle(active.id, undefined, new ChikCheckoutError(
-          ChikErrorCode.failedPrecondition,
-          "The checkout return cannot be resumed.",
-          412,
-        ));
-        return true;
-      }
-      this.#resume(active, value);
-      return true;
-    }
+    if (decision.action === "allow") return false;
     if (decision.action === "restore") {
       if (coldStart) {
         this.#settle(active.id, undefined, new ChikCheckoutError(
@@ -359,9 +348,7 @@ export class ChikReactNativeMobileCheckoutHost implements ChikMobileCheckoutHost
       return;
     }
     if (decision.action === "allow") {
-      if (!value.startsWith(active.presentation.returnScheme)) {
-        void this.#openExternalDecision(active.id, value);
-      }
+      this.#resume(active, value);
       return;
     }
     this.#handleDecision(active, value, decision);
@@ -705,7 +692,9 @@ function checkoutRecovery(value: unknown): ChikMobileCheckoutRecovery | undefine
   }
   if (redirectUrl !== undefined) {
     if (typeof redirectUrl !== "string") return undefined;
-    try { checkoutResumeURL(redirectUrl); } catch { return undefined; }
+    try {
+      if (new URL(checkoutResumeURL(redirectUrl)).hash) return undefined;
+    } catch { return undefined; }
   }
   return value as ChikMobileCheckoutRecovery;
 }
@@ -750,7 +739,7 @@ function checkoutResumeURL(value: string): string {
       { cause },
     );
   }
-  if (url.protocol !== "https:" || url.username || url.password || url.hash) {
+  if (url.protocol !== "https:" || url.username || url.password) {
     throw new ChikCheckoutError(
       ChikErrorCode.invalidResponse,
       "The checkout navigation result is invalid.",

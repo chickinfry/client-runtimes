@@ -12,7 +12,7 @@ export const TossCheckoutProfile = {
 
 export const TOSS_PENDING_URL_UNSUPPORTED_MESSAGE = "extension payments/toss supports domestic KRW synchronous checkout only; foreign asynchronous pendingUrl and CANCEL_STATUS_CHANGED are unsupported and fail closed";
 
-export const TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS = [
+export const TOSS_REVIEWED_APP_RETURN_HTTPS_HOSTS = [
   "connect.tosspayments.com",
   "pages.tosspayments.com",
   "payment-gateway.tosspayments.com",

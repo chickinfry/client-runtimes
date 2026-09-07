@@ -14,7 +14,7 @@ import {
   recoverChikReactNativeCheckout,
   restoreChikReactNativeCheckout,
 } from "../dist/react-native-checkout.js";
-import { TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS } from "../dist/toss-key-profiles.generated.js";
+import { TOSS_REVIEWED_APP_RETURN_HTTPS_HOSTS } from "../dist/toss-key-profiles.generated.js";
 
 const approvalCapability = "a".repeat(43);
 const sessionScope = "c".repeat(64);
@@ -579,7 +579,7 @@ test("shared mobile contract allows pages, opens apps, falls back, and completes
   assert.match(document, /exampleapp/);
   assert.match(document, /payments\.widgets/);
 
-  for (const host of TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS) {
+  for (const host of TOSS_REVIEWED_APP_RETURN_HTTPS_HOSTS) {
     assert.deepEqual(
       classifyChikCheckoutNavigation(
         mobileConfiguration,
@@ -589,6 +589,14 @@ test("shared mobile contract allows pages, opens apps, falls back, and completes
       { action: "allow" },
     );
   }
+  assert.deepEqual(
+    classifyChikCheckoutNavigation(
+      mobileConfiguration,
+      "https://mobile.vpay.co.kr/jsp/MISP/bcAppPay.jsp#state",
+      "ios",
+    ),
+    { action: "allow" },
+  );
 
   const resumed = "https://payment-widget.tosspayments.com/resume";
   assert.deepEqual(
@@ -787,7 +795,6 @@ test("individual payment setup failures remain UI availability errors", async ()
 
 test("mobile navigation rejects forged, duplicate, and oversized URLs", () => {
   for (const url of [
-    "https://payment-widget.tosspayments.com.attacker.test/widget",
     "https://payment-widget.tosspayments.com:444/widget",
     "evilapp://payments/open",
     "https://attacker@payment-widget.tosspayments.com/widget",
@@ -816,6 +823,10 @@ test("mobile navigation rejects forged, duplicate, and oversized URLs", () => {
   const duplicate = new URL(successUrl());
   duplicate.searchParams.append("chikCheckoutState", approvalCapability);
   expectInvalidNavigation(duplicate.toString());
+
+  const fragmentedCallback = new URL(successUrl());
+  fragmentedCallback.hash = "forged";
+  expectInvalidNavigation(fragmentedCallback.toString());
 
   expectInvalidNavigation(
     `${webConfiguration.successUrl}?payload=${"x".repeat(17_000)}`,

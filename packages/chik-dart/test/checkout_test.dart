@@ -1,6 +1,6 @@
 import 'package:chik_client/chik_client.dart';
 import 'package:chik_client/src/toss_key_profiles.generated.dart'
-    show tossReviewedCheckoutHttpsHosts;
+    show tossReviewedAppReturnHttpsHosts;
 import 'package:test/test.dart';
 
 const _approvalCapability = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -765,12 +765,18 @@ final class _ExerciseMobileHost
   @override
   Future<String> present(ChikCheckoutPresentation value) async {
     presentation = value;
-    for (final host in tossReviewedCheckoutHttpsHosts) {
+    for (final host in tossReviewedAppReturnHttpsHosts) {
       expect(
         value.navigate('https://$host/widget').action,
         ChikCheckoutNavigationAction.allow,
       );
     }
+    expect(
+      value
+          .navigate('https://mobile.vpay.co.kr/jsp/MISP/bcAppPay.jsp#state')
+          .action,
+      ChikCheckoutNavigationAction.allow,
+    );
 
     const intent = 'intent://payments/open#Intent;scheme=supertoss;'
         'package=viva.republica.toss;end';
@@ -878,7 +884,6 @@ final class _RejectingMobileHost
         '${_successUrl()}&chikCheckoutState=$_approvalCapability';
     final oversized = List<String>.filled(17000, 'x').join();
     final forged = <String>[
-      'https://payment-widget.tosspayments.com.attacker.test/widget',
       'https://payment-widget.tosspayments.com:444/widget',
       'evilapp://payments/open',
       'intent://payments/open#Intent;scheme=evilapp;'
@@ -888,6 +893,7 @@ final class _RejectingMobileHost
       'intent://payments/open#Intent;scheme=supertoss;end',
       duplicate,
       duplicateCapability,
+      '${_successUrl()}#forged',
       '${_configuration.successUrl}?payload=$oversized',
       'https://attacker@payment-widget.tosspayments.com/widget',
       _returnUrl('http://payment-widget.tosspayments.com/widget'),

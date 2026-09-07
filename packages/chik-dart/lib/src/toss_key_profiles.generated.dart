@@ -20,7 +20,7 @@ enum TossCheckoutProfile {
 
 typedef TossKeyProfile = ({TossKeyEnvironment environment, TossCheckoutProfile profile, bool paymentTypeInRedirect});
 
-const tossReviewedCheckoutHttpsHosts = <String>{
+const tossReviewedAppReturnHttpsHosts = <String>{
   "connect.tosspayments.com",
   "pages.tosspayments.com",
   "payment-gateway.tosspayments.com",

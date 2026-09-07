@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Keep safe HTTPS checkout pages inside the mobile WebView while preserving strict application-return validation.
+
 ## 0.1.2
 
 - Allow the reviewed Kakao Pay HTTPS bridge pages used by mobile checkout.

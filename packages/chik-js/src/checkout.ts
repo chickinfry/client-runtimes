@@ -1,6 +1,6 @@
 import { ChikErrorCode, type ChikErrorCode as ChikErrorCodeValue } from "./error-contract.js";
 import {
-  TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS,
+  TOSS_REVIEWED_APP_RETURN_HTTPS_HOSTS,
   TossCheckoutProfile,
   tossClientKeyProfile,
 } from "./toss-key-profiles.generated.js";
@@ -69,7 +69,7 @@ const reviewedAndroidCheckoutPackages: Readonly<Record<string, readonly string[]
   v3mobileplusweb: reviewedAndroidPackages("com.ahnlab.v3mobileplus"),
   wooripay: reviewedAndroidPackages("com.wooricard.wpay"),
 });
-const reviewedCheckoutHttpsHosts = new Set<string>(TOSS_REVIEWED_CHECKOUT_HTTPS_HOSTS);
+const reviewedAppReturnHttpsHosts = new Set<string>(TOSS_REVIEWED_APP_RETURN_HTTPS_HOSTS);
 const reviewedIOSCheckoutFallbacks: Readonly<Record<string, string>> = Object.freeze({
   supertoss: "https://apps.apple.com/app/id839333328",
   ispmobile: "https://apps.apple.com/app/id369125087",
@@ -396,7 +396,7 @@ export function classifyChikCheckoutNavigation(
   }
   let url: URL;
   try { url = new URL(value); } catch { throw new ChikCheckoutError(ChikErrorCode.invalidArgument, "The checkout navigation URL is invalid.", 400); }
-  if (url.protocol === "https:" && reviewedHttpsNavigation(url)) return { action: "allow" };
+  if (safeCheckoutPageNavigation(url)) return { action: "allow" };
   const scheme = url.protocol.slice(0, -1);
   if (scheme === config.appScheme) {
     if (!value.startsWith(`${config.appScheme}://`)) {
@@ -459,8 +459,9 @@ function requiredCheckoutRedirect(
 function checkoutRedirect(config: Required<ChikCheckoutBridgeConfiguration>, value: string): ChikCheckoutRedirect | undefined {
   let url: URL;
   try { url = new URL(value); } catch { return undefined; }
-  if (url.username || url.password || url.hash) return undefined;
-  if (sameRedirect(url, config.successUrl)) {
+  const successful = sameRedirect(url, config.successUrl);
+  const failed = sameRedirect(url, config.failUrl);
+  if (successful) {
     const paymentKey = singleSearchParameter(url, "paymentKey");
     const orderId = singleSearchParameter(url, "orderId");
     const amountText = singleSearchParameter(url, "amount");
@@ -468,7 +469,8 @@ function checkoutRedirect(config: Required<ChikCheckoutBridgeConfiguration>, val
     const paymentTypeInRedirect = tossClientKeyProfile(config.clientKey)!.paymentTypeInRedirect;
     const amount = amountText !== undefined && /^[0-9]+$/u.test(amountText) ? Number(amountText) : Number.NaN;
     const approvalCapability = singleSearchParameter(url, checkoutStateParameter);
-    if (!paymentKey || new TextEncoder().encode(paymentKey).byteLength > 200
+    if (url.username || url.password || url.hash
+      || !paymentKey || new TextEncoder().encode(paymentKey).byteLength > 200
     || !/^[A-Za-z0-9_-]{6,64}$/u.test(orderId ?? "") || !Number.isSafeInteger(amount) || amount <= 0
       || (paymentTypeInRedirect ? paymentType !== "NORMAL" : paymentType !== undefined)
       || !approvalCapabilityPattern.test(approvalCapability ?? "")) {
@@ -483,12 +485,13 @@ function checkoutRedirect(config: Required<ChikCheckoutBridgeConfiguration>, val
       approvalCapability: approvalCapability!,
     };
   }
-  if (sameRedirect(url, config.failUrl)) {
+  if (failed) {
     const code = singleSearchParameter(url, "code");
     const message = singleSearchParameter(url, "message");
     const orderId = optionalSingleSearchParameter(url, "orderId");
     const approvalCapability = singleSearchParameter(url, checkoutStateParameter);
-    if (!code || !message || code.length > 512 || message.length > 2_048
+    if (url.username || url.password || url.hash
+      || !code || !message || code.length > 512 || message.length > 2_048
       || (orderId !== undefined && !/^[A-Za-z0-9_-]{6,64}$/u.test(orderId))
       || !approvalCapabilityPattern.test(approvalCapability ?? "")) {
       throw new ChikCheckoutError(ChikErrorCode.invalidArgument, "The failed checkout redirect is invalid.", 400);
@@ -680,7 +683,7 @@ function checkoutReturnNavigation(
     throw new ChikCheckoutError(ChikErrorCode.invalidArgument, "The checkout return URL is invalid.", 400);
   }
   const redirect = checkoutRedirect(config, nested.href);
-  if (redirect === undefined && !reviewedHttpsNavigation(nested)) {
+  if (redirect === undefined && !reviewedAppReturnHttpsNavigation(nested)) {
     throw new ChikCheckoutError(ChikErrorCode.invalidArgument, "The checkout return URL is invalid.", 400);
   }
   return { action: "resume", url: nested.href };
@@ -735,9 +738,13 @@ function replaceCheckoutLocation(url: string): void {
   location.replace(url);
 }
 
-function reviewedHttpsNavigation(url: URL): boolean {
-  return !url.username && !url.password && !url.hash
-    && reviewedCheckoutHttpsHosts.has(url.hostname) && url.port === "";
+function safeCheckoutPageNavigation(url: URL): boolean {
+  return url.protocol === "https:" && !url.username && !url.password && url.port === "";
+}
+
+function reviewedAppReturnHttpsNavigation(url: URL): boolean {
+  return safeCheckoutPageNavigation(url) && !url.hash
+    && reviewedAppReturnHttpsHosts.has(url.hostname);
 }
 
 function reviewedFallback(value: string, packageName: string): boolean {

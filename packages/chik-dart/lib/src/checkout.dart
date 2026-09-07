@@ -628,7 +628,7 @@ ChikCheckoutNavigation _navigation(ChikCheckoutBridgeConfiguration config,
     throw const ChikCheckoutException(ChikErrorCode.invalidArgument,
         'The checkout navigation URL is invalid.', 400);
   }
-  if (url.scheme == 'https' && _reviewedHttpsNavigation(url)) {
+  if (_safeCheckoutPageNavigation(url)) {
     return const ChikCheckoutNavigation.allow();
   }
   if (url.scheme == config.appScheme) {
@@ -725,7 +725,7 @@ ChikCheckoutNavigation _checkoutReturnNavigation(
       _sameRedirect(nested, Uri.parse(config.failUrl));
   if (isRedirect) {
     parseChikCheckoutRedirect(config, nested.toString());
-  } else if (!_reviewedHttpsNavigation(nested)) {
+  } else if (!_reviewedAppReturnHttpsNavigation(nested)) {
     throw const ChikCheckoutException(
       ChikErrorCode.invalidArgument,
       'The checkout return URL is invalid.',
@@ -816,11 +816,16 @@ String _checkoutCallback(String value, String approvalCapability) {
   return ('payment_failed', 'Checkout could not be completed.');
 }
 
-bool _reviewedHttpsNavigation(Uri url) =>
+bool _safeCheckoutPageNavigation(Uri url) =>
+    url.scheme == 'https' &&
+    url.host.isNotEmpty &&
     url.userInfo.isEmpty &&
-    url.fragment.isEmpty &&
-    tossReviewedCheckoutHttpsHosts.contains(url.host) &&
     url.port == 443;
+
+bool _reviewedAppReturnHttpsNavigation(Uri url) =>
+    _safeCheckoutPageNavigation(url) &&
+    url.fragment.isEmpty &&
+    tossReviewedAppReturnHttpsHosts.contains(url.host);
 
 bool _reviewedFallback(String value, String packageName) {
   final url = Uri.tryParse(value);

@@ -650,19 +650,7 @@ final class _CheckoutSession {
           await complete(url.toString());
           return true;
         case ChikCheckoutNavigationAction.allow:
-          if (url.scheme != 'https') {
-            fail(
-              const ChikCheckoutException(
-                ChikErrorCode.failedPrecondition,
-                'The checkout return cannot be resumed.',
-                412,
-              ),
-              StackTrace.current,
-            );
-            return true;
-          }
-          await _resume(url.toString());
-          return true;
+          return false;
         case ChikCheckoutNavigationAction.restore:
           if ('${url.scheme}://' != returnScheme) return false;
           if (coldStart) {

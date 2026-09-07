@@ -768,10 +768,16 @@ void main() {
         if (url.startsWith('exampleapp:')) {
           return const ChikCheckoutNavigation.restore();
         }
+        if (url == 'https://checkout.example/page') {
+          return const ChikCheckoutNavigation.allow();
+        }
         return _completedNavigation;
       }),
     );
     await tester.pump();
+    warmLinks.add(Uri.parse('https://checkout.example/page'));
+    await tester.pump();
+    expect(warmPlatform.controller.request, isNull);
     warmLinks.add(Uri.parse('exampleapp://'));
     await tester.pump();
     expect(warmPlatform.controller.request, isNull);
